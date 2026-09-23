@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Tournament</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background:
+        linear-gradient(rgba(20,20,20,.65), rgba(20,20,20,.8)),
+        url("https://www.minecraft.net/content/dam/games/minecraft/key-art/MC_Java-Bedrock_Edition.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    color: white;
+}
+
+header {
+    background: #171717;
+    border-bottom: 4px solid #55c91f;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    color: #62d82b;
+    font-size: 40px;
+    text-shadow: 4px 4px #000;
+}
+
+nav {
+    margin-top: 15px;
+}
+
+nav button {
+    background: #333;
+    color: white;
+    border: 2px solid #111;
+    padding: 12px 20px;
+    margin: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+nav button:hover {
+    background: #55b51f;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 30px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.card {
+    background: rgba(25,25,25,.95);
+    border: 3px solid #444;
+    box-shadow: 0 8px 20px #000;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.card h2 {
+    color: #6bea32;
+    margin-bottom: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    background: #222;
+    color: white;
+    border: 2px solid #555;
+}
+
+.btn {
+    background: #55b51f;
+    border: 3px solid #34780d;
+    padding: 13px 20px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background: #70d72d;
+}
+
+.teams {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.team {
+    background: #292929;
+    border: 2px solid #555;
+    padding: 20px;
+    text-align: center;
+}
+
+.team span {
+    font-size: 35px;
+}
+
+.match {
+    background: #202020;
+    border-left: 6px solid #55b51f;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score button {
+    background: #444;
+    color: white;
+    border: 2px solid #666;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 14px;
+    border: 1px solid #555;
+    text-align: center;
+}
+
+th {
+    background: #4b9e19;
+}
+
+td {
+    background: #222;
+}
+
+.timer {
+    font-size: 45px;
+    color: #6bea32;
+    text-align: center;
+    margin: 20px;
+    font-weight: bold;
+}
+
+.hero {
+    text-align: center;
+    padding: 70px 20px;
+}
+
+.hero h2 {
+    font-size: 50px;
+    text-shadow: 5px 5px #000;
+}
+
+.hero p {
+    font-size: 20px;
+    margin: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>⛏️ MC TOURNAMENT</h1>
+
+    <nav>
+        <button onclick="showPage('accueil')">Accueil</button>
+        <button onclick="showPage('tournoi')">Tournoi</button>
+        <button onclick="showPage('equipes')">Équipes</button>
+        <button onclick="showPage('matchs')">Matchs</button>
+        <button onclick="showPage('classement')">Classement</button>
+    </nav>
+</header>
+
+
+<div class="container">
+
+<!-- ACCUEIL -->
+<section id="accueil" class="page active">
+
+    <div class="hero">
+
+        <h2>🏆 TOURNOIS MINECRAFT</h2>
+
+        <p>
+            Crée ton tournoi Minecraft,
+            ajoute tes équipes et lance les matchs !
+        </p>
+
+        <button class="btn" onclick="showPage('tournoi')">
+            🚀 Créer un tournoi
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- TOURNOI -->
+<section id="tournoi" class="page">
+
+    <div class="card">
+
+        <h2>🏆 Créer un tournoi</h2>
+
+        <input id="nomTournoi"
+               placeholder="Nom du tournoi">
+
+        <input id="dateTournoi"
+               type="date">
+
+        <button class="btn" onclick="creerTournoi()">
+            Créer le tournoi
+        </button>
+
+        <div id="tournoiInfo"></div>
+
+    </div>
+
+    <div class="card">
+
+        <h2>⏱️ Début du tournoi</h2>
+
+        <div class="timer" id="timer">
+            --:--:--
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- EQUIPES -->
+<section id="equipes" class="page">
+
+    <div class="card">
+
+        <h2>👥 Ajouter une équipe</h2>
+
+        <input id="nomEquipe"
+               placeholder="Nom de l'équipe">
+
+        <input id="joueurEquipe"
+               placeholder="Joueur / capitaine">
+
+        <button class="btn" onclick="ajouterEquipe()">
+            ➕ Ajouter
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <h2>⚔️ Équipes inscrites</h2>
+
+        <div id="listeEquipes" class="teams"></div>
+
+    </div>
+
+</section>
+
+
+<!-- MATCHS -->
+<section id="matchs" class="page">
+
+    <div class="card">
+
+        <h2>⚔️ Matchs</h2>
+
+        <button class="btn" onclick="genererMatchs()">
+            🎲 Générer les matchs
+        </button>
+
+        <div id="listeMatchs"></div>
+
+    </div>
+
+</section>
+
+
+<!-- CLASSEMENT -->
+<section id="classement" class="page">
+
+    <div class="card">
+
+        <h2>🏅 Classement</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Équipe</th>
+                    <th>MJ</th>
+                    <th>Victoires</th>
+                    <th>Défaites</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+
+            <tbody id="tableClassement"></tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<footer>
+    ⛏️ MC Tournament — Créé pour les joueurs Minecraft
+</footer>
+
+
+<script>
+
+// ========================
+// DONNÉES
+// ========================
+
+let equipes =
+    JSON.parse(localStorage.getItem("equipes")) || [];
+
+let tournoi =
+    JSON.parse(localStorage.getItem("tournoi")) || null;
+
+
+// ========================
+// NAVIGATION
+// ========================
+
+function showPage(page) {
+
+    document.querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document.getElementById(page)
+        .classList.add("active");
+
+}
+
+
+// ========================
+// TOURNOI
+// ========================
+
+function creerTournoi() {
+
+    const nom =
+        document.getElementById("nomTournoi").value;
+
+    const date =
+        document.getElementById("dateTournoi").value;
+
+    if (!nom || !date) {
+        alert("Remplis tous les champs !");
+        return;
+    }
+
+    tournoi = {
+        nom: nom,
+        date: date
+    };
+
+    localStorage.setItem(
+        "tournoi",
+        JSON.stringify(tournoi)
+    );
+
+    afficherTournoi();
+
+}
+
+
+function afficherTournoi() {
+
+    if (!tournoi) return;
+
+    document.getElementById("tournoiInfo").innerHTML = `
+        <div class="card">
+            <h2>${tournoi.nom}</h2>
+            <p>📅 ${tournoi.date}</p>
+        </div>
+    `;
+
+}
+
+
+// ========================
+// EQUIPES
+// ========================
+
+function ajouterEquipe() {
+
+    const nom =
+        document.getElementById("nomEquipe").value;
+
+    const joueur =
+        document.getElementById("joueurEquipe").value;
+
+    if (!nom) {
+        alert("Entre un nom d'équipe !");
+        return;
+    }
+
+    equipes.push({
+        nom: nom,
+        joueur: joueur || "Inconnu",
+        matchs: 0,
+        victoires: 0,
+        defaites: 0,
+        points: 0
+    });
+
+    localStorage.setItem(
+        "equipes",
+        JSON.stringify(equipes)
+    );
+
+    document.getElementById("nomEquipe").value = "";
+    document.getElementById("joueurEquipe").value = "";
+
+    afficherEquipes();
+    afficherClassement();
+
+}
+
+
+function afficherEquipes() {
+
+    const zone =
+        document.getElementById("listeEquipes");
+
+    zone.innerHTML = "";
+
+    equipes.forEach((equipe, index) => {
+
+        zone.innerHTML += `
+
+        <div class="team">
+
+            <span>🧑‍🚀</span>
+
+            <h3>${equipe.nom}</h3>
+
+            <p>👤 ${equipe.joueur}</p>
+
+            <button class="btn"
+                onclick="supprimerEquipe(${index})">
+                ❌ Supprimer
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+function supprimerEquipe(index) {
+
+    equipes.splice(index, 1);
+
+    localStorage.setItem(
+        "equipes",
+        JSON.stringify(equipes)
+    );
+
+    afficherEquipes();
+    afficherClassement();
+
+}
+
+
+// ========================
+// MATCHS
+// ========================
+
+function genererMatchs() {
+
+    if (equipes.length < 2) {
+        alert("Il faut au moins 2 équipes !");
+        return;
+    }
+
+    const zone =
+        document.getElementById("listeMatchs");
+
+    zone.innerHTML = "";
+
+    for (let i = 0; i < equipes.length; i += 2) {
+
+        if (!equipes[i + 1]) break;
+
+        zone.innerHTML += `
+
+        <div class="match">
+
+            <h3>
+                ⚔️ Match ${i / 2 + 1}
+            </h3>
+
+            <div class="score">
+
+                <strong>
+                    ${equipes[i].nom}
+                </strong>
+
+                <button onclick="victoire(${i}, ${i+1})">
+                    🏆 Victoire
+                </button>
+
+                <strong>
+                    ${equipes[i+1].nom}
+                </strong>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+function victoire(a, b) {
+
+    equipes[a].matchs++;
+    equipes[b].matchs++;
+
+    equipes[a].victoires++;
+    equipes[b].defaites++;
+
+    equipes[a].points += 3;
+
+    localStorage.setItem(
+        "equipes",
+        JSON.stringify(equipes)
+    );
+
+    afficherClassement();
+
+    alert(
+        equipes[a].nom +
+        " gagne le match !"
+    );
+
+}
+
+
+// ========================
+// CLASSEMENT
+// ========================
+
+function afficherClassement() {
+
+    const table =
+        document.getElementById("tableClassement");
+
+    table.innerHTML = "";
+
+    let classement =
+        [...equipes].sort(
+            (a, b) => b.points - a.points
+        );
+
+    classement.forEach((equipe, index) => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>${index + 1}</td>
+
+            <td>${equipe.nom}</td>
+
+            <td>${equipe.matchs}</td>
+
+            <td>${equipe.victoires}</td>
+
+            <td>${equipe.defaites}</td>
+
+            <td><strong>${equipe.points}</strong></td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+
+// ========================
+// COMPTE À REBOURS
+// ========================
+
+function updateTimer() {
+
+    if (!tournoi) return;
+
+    const maintenant =
+        new Date();
+
+    const dateTournoi =
+        new Date(tournoi.date);
+
+    const difference =
+        dateTournoi - maintenant;
+
+    if (difference <= 0) {
+
+        document.getElementById("timer")
+            .textContent = "🔥 TOURNOI EN COURS !";
+
+        return;
+    }
+
+    const jours =
+        Math.floor(
+            difference / (1000 * 60 * 60 * 24)
+        );
+
+    const heures =
+        Math.floor(
+            difference / (1000 * 60 * 60)
+        ) % 24;
+
+    const minutes =
+        Math.floor(
+            difference / (1000 * 60)
+        ) % 60;
+
+    const secondes =
+        Math.floor(
+            difference / 1000
+        ) % 60;
+
+    document.getElementById("timer")
+        .textContent =
+        `${jours}j ${heures}h ${minutes}m ${secondes}s`;
+
+}
+
+
+// ========================
+// INITIALISATION
+// ========================
+
+afficherEquipes();
+afficherClassement();
+afficherTournoi();
+
+setInterval(updateTimer, 1000);
+
+</script>
+
+</body>
+</html>
